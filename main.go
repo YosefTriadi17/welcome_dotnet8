@@ -28,7 +28,7 @@ func HelloServer(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello, World! Versi 1.0.1")
 }
 
-// Release 366
+// Release 367
 // changes 1
 
 // git checkout -b feat/new5
