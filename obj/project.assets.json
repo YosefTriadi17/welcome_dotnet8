@@ -279,11 +279,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\IFS\\experiment-repo\\welcome.csproj",
+      "projectUniqueName": "D:\\IFS\\experiment-repo2\\welcome.csproj",
       "projectName": "welcome",
-      "projectPath": "D:\\IFS\\experiment-repo\\welcome.csproj",
+      "projectPath": "D:\\IFS\\experiment-repo2\\welcome.csproj",
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "D:\\IFS\\experiment-repo\\obj\\",
+      "outputPath": "D:\\IFS\\experiment-repo2\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
