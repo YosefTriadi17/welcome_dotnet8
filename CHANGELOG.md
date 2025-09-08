@@ -1,3 +1,15 @@
+## 🎉 Version v1.1.0
+Monday, 08 September 2025 17:29 WIB | Development | prev v1.0.0
+
+### ✨ New Features
+  - feat: Tusesday 11 Feb 2025 0d97fe148ba4b0bb843f14f3339518190c4b93eb
+  Penambahan Fitur, Dengan menambahkan langkah ini, Anda dapat memverifikasi bahwa pesan commit telah dikumpulkan dengan benar sebelum melanjutkan ke langkah pembuatan tag dan rilis.
+
+
+
+### 👤 Updated by
+- Yosef Triadi [55664947+YosefTriadi17@users.noreply.github.com]
+------------
 ## 🎉 Version v6.54.0
 Monday, 08 September 2025 17:12 WIB | Development | prev v6.53.0
 
