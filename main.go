@@ -31,7 +31,7 @@ func HelloServer(w http.ResponseWriter, r *http.Request) {
 // Release 366
 // changes 1
 
-// git checkout -b feat/new2
+// git checkout -b feat/new3
 
 // git checkout production
 
