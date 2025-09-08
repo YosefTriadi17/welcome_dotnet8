@@ -1,0 +1,958 @@
+@using System.Globalization
+@model PrintFormulirKKB
+@{
+    Layout = null;
+    var M = Model.KKBCalonNasabah;
+
+    string checkbox = "<svg xmlns='' width='12' height='12' fill='currentColor' class='bi bi-check-square' viewBox='0 0 16 16'> <path d='M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z'/> <path d='M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z'/> </svg>";
+
+    string uncheckbox = "<svg xmlns='' width='12' height='12' fill='currentColor' class='bi bi-square' viewBox='0 0 16 16'> <path d='M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z'/> </svg>";
+}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cetak Formulir Pengajuan KKB</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="~/assets/img/favicon/favicon.ico" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <style>
+        tr, th, td {
+            margin: 0;
+            padding: 0;
+        }
+
+        tr {
+            height: 16.5px;
+        }
+
+        td {
+            padding-left: 5px;
+            padding-top: 1px;
+        }
+
+        body {
+            font-size: 11px;
+            font-family: 'Times New Roman', Times, serif;
+            padding: 0px;
+        }
+
+        input {
+            vertical-align: top;
+            margin: 2px;
+        }
+
+        ul {
+            margin: 0px;
+            padding-left: 5px;
+        }
+
+        /* class */
+        .img3x4 {
+            /* width: 3cm;
+            height: 4cm;
+            padding: 0;
+            margin: 0; */
+            position: absolute;  
+            top: 50px;
+            right: 20px;  
+            width: 3cm; /* Adjust width as needed for 3x4 aspect ratio */  
+            height: 4cm;
+            z-index: 1
+        }
+
+        .h06 {
+            height: 0.6cm;
+        }
+
+        p.list-document {
+            margin: 0;
+            text-indent: -2%;
+            padding-left: 2%;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        .no-page-break {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        body {  
+            margin: 0;  
+            padding: 0;  
+            font-family: Arial, sans-serif;  
+        }  
+        
+        .container {  
+            /* position: relative;   */
+            /* padding: 20px;   */
+        }
+
+    </style>
+</head>
+<body>
+    <img class="img3x4" style="border: 1px solid;" src="https://i.pinimg.com/736x/5e/72/58/5e7258f00c185b741f41ab1216bb3ee9.jpg" alt="">
+
+    @*Formulir pengajuan*@
+    <div class="text-center fw-bold">
+        FORMULIR PENGAJUAN PEMBIAYAAN KENDARAAN BERMOTOR (PKB)
+        <br>
+        Nomor : @M.kode_pengajuan
+    </div>
+
+    <br>
+    <table class="table-bordered">
+        <tr>
+            <th class="text-center" colspan="4">
+                Informasi Data Pemohon
+            </th>
+        </tr>
+        <tr class="h06">
+            <td width="25%">
+                Jenis Pengajuan KKB
+            </td>
+            <td width="60%" colspan="2">
+                <table class="w-100" style="border: 0px solid white">
+                    <tr>
+                        <td class="w-50">
+                            @Html.Raw((M.jenis_pengajuan.ToLower() == "dengan rekomendasi") ? checkbox : uncheckbox)
+                            <label>Dengan Rekomendasi</label>
+                        </td>
+                        <td>
+                            @Html.Raw((M.jenis_pengajuan.ToLower() == "tanpa rekomendasi") ? checkbox : uncheckbox)
+                            <label>Tanpa Rekomendasi</label>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <!-- <td rowspan="7" class="align-top img3x4">
+                <img class="w-100 h-100" style="border: 1px solid;" src="https://i.pinimg.com/736x/5e/72/58/5e7258f00c185b741f41ab1216bb3ee9.jpg" alt="">
+            </td> -->
+        </tr>
+        <tr class="h06">
+            <td>Jenis Kendaraan</td>
+            <td colspan="2">
+                <table class="w-100" style="border: 0px solid white">
+                    <tr>
+                        <td class="w-50">
+                            @Html.Raw((M.jenis_kendaraan.ToLower() == "mobil") ? checkbox : uncheckbox)
+                            <label>Mobil</label>
+                        </td>
+                        <td>
+                            @Html.Raw((M.jenis_kendaraan.ToLower() == "motor") ? checkbox : uncheckbox)
+                            <label>Motor</label>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr class="h06">
+            <td>Tujuan Pengajuan Pembiayaan</td>
+            <td colspan="2">@Model.tujuan_pengajuan_kredit_string</td>
+        </tr>
+        <tr class="h06">
+            <td>Jumlah Pembiayaan yang Diajukan</td>
+            <td colspan="2">Rp. @M.jumlah_pencairan_dana.ToString("N0")</td>
+        </tr>
+        <tr class="h06 w-100">
+            <td width="25%">Harga Mobil</td>
+            <td width="25%">Rp. @M.harga_kendaraan.ToString("N0")</td>
+            <td width="25%" class="d-flex" style="border-right: 0px solid white;">
+                <div class="w-100" style="width: 300px; overflow-wrap: break-word; word-wrap: break-all;">
+                    Plafon Kantor: 109000000099999999999999999992222222222222222222222222
+                </div>
+            </td>
+            <td width="25%" style="border-left: 0px solid white"></td>
+        </tr>
+        <tr class="h06">
+            <td>Nama Pemohon</td>
+            <td width="25%">@M.nama_pemohon</td>
+            <td>Usia : @M.usia Tahun</td>
+        </tr>
+        <tr class="h06">
+            <td>Jenis Kelamin</td>
+            <td>
+                <table class="w-100" style="border: 0px solid white">
+                    <tr>
+                        <td>
+                            @Html.Raw((M.jenis_kelamin.ToLower() == "pria") ? checkbox : uncheckbox)
+                            <label>Pria</label>
+                        </td>
+                        <td>
+                            @Html.Raw((M.jenis_kelamin.ToLower() == "wanita") ? checkbox : uncheckbox)
+                            <label>Wanita</label>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td rowspan="5">
+                Status Pernikahan:
+                @* reff from table master_perkawinan
+                1 Kawin
+                2 Belum Kawin
+                3 Cerai *@
+                <div>
+                    @Html.Raw((M.status_pernikahan.ToLower() == "2") ? checkbox : uncheckbox)
+                    <label>Belum Kawin</label>
+                </div>
+                <div>
+                    @Html.Raw((M.status_pernikahan.ToLower() == "1") ? checkbox : uncheckbox)
+                    <label>Kawin, Jumlah Anak: @((M.status_pernikahan.ToLower() == "1") ? M.jumlah_anak : "....") </label>
+                </div>
+                <div>
+                    @Html.Raw((M.status_pernikahan.ToLower() == "3") ? checkbox : uncheckbox)
+                    <label>
+                        Janda/Duda
+                        <br>
+                        <span>(Cerai/Meninggal) *</span>
+                    </label>
+                </div>
+
+                <p style="font-style: italic; margin: 5px;">* coret yang tidak perlu
+            </td>
+        </tr>
+        <tr class="h06">
+            <td>Nomor KTP</td>
+            <td>@M.nomor_ktp</td>
+            <td style="border-left: 2px solid white;"></td>
+        </tr>
+        <tr>
+            <td>Masa Berlaku KTP</td>
+            <td>@M.masa_berlaku_ktp</td>
+            <td style="border-top: 2px solid white; border-left: 2px solid white;"></td>
+        </tr>
+        <tr>
+            <td>Tempat Lahir</td>
+            <td>@M.tempat_lahir</td>
+            <td style="border-top: 2px solid white; border-left: 2px solid white;"></td>
+        </tr>
+        <tr>
+            <td>Tanggal Lahir</td>
+            <td>@M.tanggal_lahir.ToString("dd-MM-yyyy")</td>
+            <td style="border-top: 2px solid white; border-left: 2px solid white;"></td>
+        </tr>
+        <tr>
+            <td>Alamat sesuai KTP</td>
+            <td>@M.alamat_ktp</td>
+            <td colspan="2" rowspan="4">
+                Status Tempat Tinggal:
+                <div>
+                    @Html.Raw((M.status_tempat_tinggal.ToLower() == "milik sendiri") ? checkbox : uncheckbox)
+                    <label>Milik Sendiri</label>
+                </div>
+                <div>
+                    @Html.Raw((M.status_tempat_tinggal.ToLower() == "milik orang tua") ? checkbox : uncheckbox)
+                    <label>Milik Orang Tua</label>
+                </div>
+                <div>
+                    @Html.Raw((M.status_tempat_tinggal.ToLower() == "sewa/kontrak") ? checkbox : uncheckbox)
+                    <label>Sewa / Kontrak</label>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>ALamat Tinggal</td>
+            <td>@M.alamat_domisili</td>
+        </tr>
+        <tr>
+            <td>Nomor Telepon</td>
+            <td>@M.nomor_telepon</td>
+        </tr>
+        <tr>
+            <td>Pendidikan Terakhir</td>
+            <td>@M.pendidikan_terakhir</td>
+        </tr>
+        <tr>
+            <td>Nama Ibu Kandung</td>
+            <td>@M.nama_ibu_kandung</td>
+            <td colspan="2">
+                <table class="w-100" style="border: 0px solid white">
+                    <tr>
+                        <td class="w-50">
+                            Jumlah Tanggungan
+                        </td>
+                        <td>: @M.jumlah_tanggungan</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>Alamat e-mail</td>
+            <td>@M.alamat_email</td>
+            <td colspan="2"></td>
+        </tr>
+
+        <!-- Informasi Pekerjaan & Informasi Darurat  -->
+        <tr class="text-center">
+            <th colspan="2">Informasi Pekerjaan</th>
+            <th colspan="2">Yang Dapat Dihubungi dalam Situasi Darurat</th>
+        </tr>
+        <tr>
+            <td>Nama Perusahaan</td>
+            <td>@M.nama_perusahaan</td>
+            <td colspan="2">
+                <table class="w-100" style="border: 0px solid white">
+                    <tr>
+                        <td class="w-50">Nama</td>
+                        <td>: @M.nama_darurat</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>Status Pekerjaan</td>
+            <td>@M.status_pekerjaan</td>
+            <td colspan="2">
+                <table class="w-100" style="border: 0px solid white">
+                    <tr>
+                        <td class="w-50">Nomor Telepon</td>
+                        <td>: @M.nomor_telepon_darurat </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>Mulai Bekerja</td>
+            <td>@M.mulai_bekerja.ToString("dd-MM-yyyy")</td>
+            <td colspan="2">
+                <table class="w-100" style="border: 0px solid white">
+                    <tr>
+                        <td class="w-50">Hub. Dengan Pemohon</td>
+                        <td>: @M.hub_dengan_pemohon</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>Jabatan</td>
+            <td>@M.jabatan</td>
+            <td colspan="2" rowspan="5" class="align-top">
+                <table class="w-100" style="border: 0px solid white">
+                    <tr>
+                        <td class="w-50">Alamat</td>
+                        <td>: @M.alamat_darurat</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>Bagian / Divisi</td>
+            <td>@M.bagian_divisi</td>
+        </tr>
+        <tr>
+            <td>Nama Atasan Langsung</td>
+            <td>@M.nama_atasan_langsung</td>
+        </tr>
+        <tr>
+            <td>Nomor Telepon Kantor</td>
+            <td>@M.nomor_telepon_kantor</td>
+        </tr>
+        <tr>
+            <td>Alamat Kantor</td>
+            <td>@M.alamat_kantor</td>
+        </tr>
+
+        <!-- Informasi Data Pasangan  -->
+        <tr class="text-center">
+            <th colspan="4">Informasi Data Pasangan</th>
+        </tr>
+        <tr>
+            <td>Nama Pasangan</td>
+            <td>@(!string.IsNullOrEmpty(M.nama_pasangan) ? M.nama_pasangan : "-")</td>
+            <td colspan="2">
+                <table class="w-100" style="border: 0px solid white">
+                    <tr>
+                        <td class="w-50">Nomor Telepon</td>
+                        <td>: @(!string.IsNullOrEmpty(M.nomor_telepon_pasangan) ? M.nomor_telepon_pasangan : "-")</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>Tempat Lahir</td>
+            <td>@(!string.IsNullOrEmpty(M.tempat_lahir_pasangan) ? M.tempat_lahir_pasangan : "-")</td>
+            <td colspan="2" rowspan="4" class="align-top">
+                <table class="w-100" style="border: 0px solid white">
+                    <tr>
+                        <td class="w-50">Alamat Tinggal</td>
+                        <td>: @(!string.IsNullOrEmpty(M.alamat_tinggal_pasangan) ? M.alamat_tinggal_pasangan : "-")</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>Tanggal Lahir</td>
+            <td>@((M.tanggal_lahir_pasangan != DateTime.MinValue) ? M.tanggal_lahir_pasangan.ToString("dd-MM-yyyy") : "-")</td>
+        </tr>
+        <tr>
+            <td>Lokasi Kerja</td>
+            <td> @(!string.IsNullOrEmpty(M.lokasi_kerja_pasangan) ? M.lokasi_kerja_pasangan : "-")</td>
+        </tr>
+        <tr>
+            <td>Nama Ibu Kandung Pasangan</td>
+            <td> @(!string.IsNullOrEmpty(M.nama_ibu_kandung_pasangan) ? M.nama_ibu_kandung_pasangan : "-")</td>
+        </tr>
+
+        <!-- Informasi Kendaraan -->
+        <tr class="text-center">
+            <th colspan="4">Informasi Kendaraan</th>
+        </tr>
+        <tr>
+            <td style="border-right: 1px solid white;">Kondisi Kendaraan</td>
+            <td colspan="3">
+                <div>
+                    @Html.Raw((M.kondisi_kendaraan.ToLower() == "baru") ? checkbox : uncheckbox)
+                    <label>Baru</label>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="border-right: 1px solid white;">
+                Merek, jenis dan Jumlah cc
+            </td>
+            <td colspan="4">
+                <table class="w-100" style="border: 0px solid white">
+                    <tr>
+                        <td class="w-50">Merek: @M.merek_kendaraan</td>
+                        <td>Jumlah cc: @M.jumlah_cc_kendaraan</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="border-right: 1px solid white;"></td>
+            <td colspan="3">
+                <table class="w-100" style="border: 0px solid white">
+                    <tr>
+                        <td>Jenis</td>
+                        <td>
+                            @Html.Raw((M.jenis_mobil_kendaraan.ToLower() == "sedan") ? checkbox : uncheckbox)
+                            <label>Sedan</label>
+                        </td>
+                        <td>
+                            @Html.Raw((M.jenis_mobil_kendaraan.ToLower() == "jeep") ? checkbox : uncheckbox)
+                            <label>Jeep</label>
+                        </td>
+                        <td>
+                            @Html.Raw((M.jenis_mobil_kendaraan.ToLower() == "suv") ? checkbox : uncheckbox)
+                            <label>SUV</label>
+                        </td>
+                        <td>
+                            @Html.Raw((M.jenis_mobil_kendaraan.ToLower() == "minibus") ? checkbox : uncheckbox)
+                            <label>Minibus</label>
+                        </td>
+                        <td>
+                            @{
+                                string[] array_jemoken = { "sedan", "jeep", "suv", "minibus" };
+                            }
+
+                            @if (!array_jemoken.Contains(M.jenis_mobil_kendaraan.ToLower()))
+                            {
+                                @Html.Raw(checkbox)
+
+                                <label>Lainnya, @M.jenis_mobil_kendaraan</label>
+                            }
+                            else
+                            {
+                                @Html.Raw(uncheckbox)
+                                <label>Lainnya, ..........</label>
+                            }
+
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="border-right: 1px solid white;">Produksi</td>
+            <td colspan="3">
+                <table class="w-100" style="border: 0px solid white">
+                    <tr>
+                        <td>
+                            @Html.Raw((M.produksi_kendaraan.ToLower() == "jepang") ? checkbox : uncheckbox)
+                            <label>Jepang</label>
+                        </td>
+                        <td>
+                            @Html.Raw((M.produksi_kendaraan.ToLower() == "non jepang") ? checkbox : uncheckbox)
+                            <label>Non Jepang</label>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <div class="d-fle w-100">
+                    <span>Jumlah Uang Muka yang Dibayar (Motor min. 5% dan Mobil min. 10% dari Harga Beli Kendaraan)</span>
+                    <span class="ms-4">Rp. @M.jumlah_uang_muka_kendaraan.ToString("N0")</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="border-right: 1px solid white;" class="align-top">Tempat Pembelian</td>
+            <td colspan="3">
+                <table class="w-100" style="border: 0px solid white">
+                    <tr>
+                        <td>
+                            @Html.Raw((M.tempat_pembelian_kendaraan.ToLower() == "dealer atpm") ? checkbox : uncheckbox)
+                            <label>Dealer ATPM</label>
+                        </td>
+                        <td>
+                            @Html.Raw((M.tempat_pembelian_kendaraan.ToLower() == "dealer umum") ? checkbox : uncheckbox)
+
+                            <label>Dealer Umum</label>
+                        </td>
+                        <td>
+                            @Html.Raw((M.tempat_pembelian_kendaraan.ToLower() == "perorangan") ? checkbox : uncheckbox)
+                            <label>Perorangan</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Raw((M.tempat_pembelian_kendaraan.ToLower() == "perusahaan") ? checkbox : uncheckbox)
+                            <label>Perusahaan</label>
+                        </td>
+                        <td>
+                            @{
+                                string[] array_tempean = { "dealer atpm", "dealer umum", "perorangan", "perusahaan" };
+                            }
+                            @Html.Raw((!array_tempean.Contains(M.tempat_pembelian_kendaraan.ToLower())) ? checkbox : uncheckbox)
+                            <label>Lainnya</label>
+
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="border-right: 1px solid white;">
+                Nama Dealer / Penjual
+            </td>
+            <td style="border-right: 1px solid white;">
+                : @M.nama_dealer_penjual_kendaraan
+            </td>
+            <td colspan="2">
+                Nomor Telepon : @M.nomor_telepon_dealer_penjual_kendaraan
+            </td>
+        </tr>
+        <tr>
+            <td style="border-right: 1px solid white;">
+                Alamat Dealer / Penjual
+            </td>
+            <td colspan="3">
+                : @M.alamat_dealer_penjual_kendaraan
+            </td>
+        </tr>
+        <tr>
+            <td style="border-right: 1px solid white;">
+                Kepemilikan Kendaraan ke-
+            </td>
+            <td colspan="3">
+                <table class="w-100" style="border: 0px solid white">
+                    <tr>
+                        <td>
+                            @Html.Raw((M.kepemilikan_kendaraan_ke.ToLower() == "1") ? checkbox : uncheckbox)
+                            <label>Pertama</label>
+                        </td>
+                        <td>
+                            @Html.Raw((M.kepemilikan_kendaraan_ke.ToLower() == "2") ? checkbox : uncheckbox)
+                            <label>Kedua</label>
+                        </td>
+                        <td>
+                            @Html.Raw((M.kepemilikan_kendaraan_ke.ToLower() == "3") ? checkbox : uncheckbox)
+                            <label>Ketiga</label>
+                        </td>
+                        <td>
+                            @if (int.Parse(M.kepemilikan_kendaraan_ke) > 3)
+                            {
+                                @Html.Raw(checkbox)
+                                <label>Lainnya, ke- @M.kepemilikan_kendaraan_ke</label>
+                            }
+                            else
+                            {
+                                @Html.Raw(uncheckbox)
+                                <label>Lainnya, ke- ......</label>
+                            }
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                Kendaraan lain yang sudah dimiliki (jika ada) : @M.kendaraan_lain_yang_sudah_dimiliki
+            </td>
+        </tr>
+
+        <!-- Tanda tangan  -->
+        <tr>
+            <td colspan="4">
+                Saya yang bertandatangan di bawah ini menyatakan bahwa seluruh data yang saya berikan adalah benar dan Saya bersedia mengikuti syarat dan ketentuan pembiayaan kendaraan Bermotor PT. IMFS serta memberi kuasa kepada PT. IMFS untuk memeriksa semua data dengan cara bagaimanapun yang layak menurut PT. IMFS dan peraturan perundang-undangan termasuk namun tidak terbatas pada pengecekan data pribadi melalui IDEB OJK.
+
+                <br>
+                <table class="w-100 text-center mt-2 border-top no-page-break" style="border: 0px solid white;">
+                    <tr class="fw-bol">
+                        <td width="33%">@M.tgl_diajukan?.ToString("dd MMMM yyyy", new CultureInfo("id-ID"))</td>
+                        <td width="33%">
+                            @* Persetujuan
+                            <br>Suami / Istri *@
+                        </td>
+                        <td>
+                            @*  Persetujuan / Rekomendasi
+                            <br>Perusahaan *@
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <br>
+                            <br>
+                            <br>
+                            <br>
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            ( @M.nama_pemohon )
+                            <br>Pemohon
+                        </td>
+                        <td>
+                            @* <span style="color: white;">----------</span>
+                            @if (!string.IsNullOrEmpty(M.nama_pasangan))
+                            {
+                            @M.nama_pasangan
+                            }
+                            else
+                            {
+                            <span style="color: white;">----------</span>
+                            }
+                            <span style="color: white;">----------</span> *@
+                        </td>
+                        <td>
+                            @* ( <span style="color: white;">------------------------------</span> )
+                            <br> ( Jabatan ) *@
+                        </td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+    
+
+    <table class="no-page-break w-100">
+        <!-- Persyaratan Dokumen yang diperlukan  -->
+        <tr class="text-center no-page-break">
+            <th colspan="4">Persyaratan Dokumen yang diperlukan</th>
+        </tr>
+        <tr>
+            <td colspan="2" class="w-50">
+                <p class="list-document">- Fotocopy KTP Pemohon dan Pasangan (untuk status kawin)</p>
+            </td>
+            <td colspan="2" rowspan="3">
+                <p class="list-document">- Untuk kendaraan baru wajib melampirkan Fotocopy Dokumentasi Pembelian Kendaraan, seperti : Faktur dan Bukti Pemesanan Kendaraan</p>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <p class="list-document">- Fotocopy Persetujuan Pasangan (untuk status kawin)</p>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <p class="list-document">- Fotocopy Kartu Keluarga</p>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <p class="list-document">- Fotocopy Akta Kawin (untuk status kawin)</p>
+            </td>
+            <td colspan="2" rowspan="3">
+                <p class="list-document">- Untuk Jenis Pengajuan "Tanpa Rekomendasi", wajib melampirkan dokumen terkait bukti penghasilan, seperti : Slip Gaji / Laporan SPT Tahunan terakhir / dll.</p>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <p class="list-document">- Fotocopy NPWP</p>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <p class="list-document">- Fotocopy Surat Cerai (untuk status Janda/Duda)</p>
+            </td>
+        </tr>
+    </table>
+    @*Formulir pengajuan end*@
+
+
+    @{
+        int number = 0;
+    }
+    <style>
+        .document-canvas {
+            border: 1px solid black;
+            width: 100%;
+            height: 26cm;
+        }
+
+        .document-header {
+            border-bottom: 1px solid black;
+            padding: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .document-content {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .document-img {
+            min-width: 60%;
+            max-width: 95%;
+            min-height: 60%;
+            max-height: 95%;
+        }
+    </style>
+
+    @*Dokumen Foto Kanan*@
+    <div class="page-break"></div>
+    <div class="text-center fw-bold mb-3">
+        DOKUMEN PENDUKUNG
+    </div>
+    <div class="document-canvas">
+        <div class="document-header">
+            @(++number). Foto Diri Tampak Kanan
+        </div>
+        <div class="document-content">
+            <img src="@M.foto_diri_kanan" class="document-img" />
+        </div>
+    </div>
+    @*Dokumen Foto Kanan end*@
+
+    @*Dokumen Foto Kiri*@
+    <div class="page-break"></div>
+    <div class="text-center fw-bold mb-3">
+        DOKUMEN PENDUKUNG
+    </div>
+    <div class="document-canvas">
+        <div class="document-header">
+            @(++number). Foto Diri Tampak Kiri
+        </div>
+        <div class="document-content">
+            <img src="@M.foto_diri_kiri" class="document-img" />
+        </div>
+    </div>
+    @*Dokumen Foto Kiri end*@
+
+    @*Dokumen KTP*@
+    <div class="page-break"></div>
+    <div class="text-center fw-bold mb-3">
+        DOKUMEN PENDUKUNG
+    </div>
+    <div class="document-canvas">
+        <div class="document-header">
+            @(++number). Fotocopy Kartu Tanda Penduduk yang masih berlaku
+        </div>
+        <div class="document-content">
+            <img src="@M.foto_ktp" class="document-img" />
+        </div>
+    </div>
+    @*Dokumen KTP end*@
+
+    @*Dokumen KTP Pasangan*@
+    @if (!string.IsNullOrEmpty(M.foto_ktp_pasangan))
+    {
+        <div class="page-break"></div>
+        <div class="text-center fw-bold mb-3">
+            DOKUMEN PENDUKUNG
+        </div>
+        <div class="document-canvas">
+            <div class="document-header">
+                @(++number). Fotocopy Kartu Tanda Penduduk Pasangan
+            </div>
+            <div class="document-content">
+                <img src="@M.foto_ktp_pasangan" class="document-img" />
+            </div>
+        </div>
+    }
+    @*Dokumen KTP Pasangan end*@
+
+    @*Dokumen Dokumentasi Pembelian Kendaraan*@
+    @if (!string.IsNullOrEmpty(M.foto_dokumen_pembelian_kendaraan))
+    {
+        <div class="page-break"></div>
+        <div class="text-center fw-bold mb-3">
+            DOKUMEN PENDUKUNG
+        </div>
+        <div class="document-canvas">
+            <div class="document-header">
+                @(++number). Fotocopy Dokumentasi Pembelian Kendaraan
+            </div>
+            <div class="document-content">
+                <img src="@M.foto_dokumen_pembelian_kendaraan" class="document-img" />
+            </div>
+        </div>
+    }
+    @*Dokumen Dokumentasi Pembelian Kendaraan end*@
+
+    @*Dokumen Fotocopy Surat Rekomendasi dari Perusahaan*@
+    @if (!string.IsNullOrEmpty(M.foto_surat_rekomendasi_perusahaan))
+    {
+        <div class="page-break"></div>
+        <div class="text-center fw-bold mb-3">
+            DOKUMEN PENDUKUNG
+        </div>
+        <div class="document-canvas">
+            <div class="document-header">
+                @(++number). Foto Surat Rekomendasi dari Perusahaan
+            </div>
+            <div class="document-content">
+                <img src="@M.foto_surat_rekomendasi_perusahaan" class="document-img" />
+            </div>
+        </div>
+    }
+    @*Dokumen Fotocopy Surat Rekomendasi dari Perusahaan end*@
+
+    @*Dokumen Fotocopy Kartu Keluarga*@
+    @if (!string.IsNullOrEmpty(M.foto_kartu_keluarga))
+    {
+        <div class="page-break"></div>
+        <div class="text-center fw-bold mb-3">
+            DOKUMEN PENDUKUNG
+        </div>
+        <div class="document-canvas">
+            <div class="document-header">
+                @(++number). Fotocopy Kartu Keluarga
+            </div>
+            <div class="document-content">
+                <img src="@M.foto_kartu_keluarga" class="document-img" />
+            </div>
+        </div>
+    }
+    @*Dokumen Fotocopy Kartu Keluarga end*@
+
+    @*Dokumen Fotocopy Akta Nikah*@
+    @if (!string.IsNullOrEmpty(M.foto_akta_nikah))
+    {
+        <div class="page-break"></div>
+        <div class="text-center fw-bold mb-3">
+            DOKUMEN PENDUKUNG
+        </div>
+        <div class="document-canvas">
+            <div class="document-header">
+                @(++number). Fotocopy Akta Nikah
+            </div>
+            <div class="document-content">
+                <img src="@M.foto_akta_nikah" class="document-img" />
+            </div>
+        </div>
+    }
+    @*Dokumen Fotocopy Akta Nikah end*@
+
+    @*Dokumen Terkait Bukti Penghasilan*@
+    @if (!string.IsNullOrEmpty(M.foto_bukti_penghasilan))
+    {
+        <div class="page-break"></div>
+        <div class="text-center fw-bold mb-3">
+            DOKUMEN PENDUKUNG
+        </div>
+        <div class="document-canvas">
+            <div class="document-header">
+                @(++number). Dokumen Terkait Bukti Penghasilan
+            </div>
+            <div class="document-content">
+                <img src="@M.foto_bukti_penghasilan" class="document-img" />
+            </div>
+        </div>
+    }
+    @*Dokumen Terkait Bukti Penghasilan end*@
+
+    @*Dokumen NPWP*@
+    @if (!string.IsNullOrEmpty(M.foto_npwp))
+    {
+        <div class="page-break"></div>
+        <div class="text-center fw-bold mb-3">
+            DOKUMEN PENDUKUNG
+        </div>
+        <div class="document-canvas">
+            <div class="document-header">
+                @(++number). Fotocopy NPWP
+            </div>
+            <div class="document-content">
+                <img src="@M.foto_npwp" class="document-img" />
+            </div>
+        </div>
+    }
+    @*Dokumen NPWP end*@
+
+    @*Dokumen Surat Cerai (untuk status Janda/Duda)*@
+    @if (!string.IsNullOrEmpty(M.foto_surat_cerai))
+    {
+        <div class="page-break"></div>
+        <div class="text-center fw-bold mb-3">
+            DOKUMEN PENDUKUNG
+        </div>
+        <div class="document-canvas">
+            <div class="document-header">
+                @(++number). Fotocopy Surat Cerai (untuk status Janda/Duda)
+            </div>
+            <div class="document-content">
+                <img src="@M.foto_surat_cerai" class="document-img" />
+            </div>
+        </div>
+    }
+    @*Dokumen Surat Cerai (untuk status Janda/Duda) end*@
+
+    @*Dokumen Surat Cerai (untuk status Janda/Duda)*@
+    @if (!string.IsNullOrEmpty(M.foto_form_persetujuan_pasangan))
+    {
+        <div class="page-break"></div>
+        <div class="text-center fw-bold mb-3">
+            DOKUMEN PENDUKUNG
+        </div>
+        <div class="document-canvas">
+            <div class="document-header">
+                @(++number). Fotocopy Form Persetujuan Pasangan
+            </div>
+            <div class="document-content">
+                <img src="@M.foto_form_persetujuan_pasangan"
+                style="min-width: 80%;
+                    max-width: 95%;
+                    min-height: 80%;
+                    max-height: 95%;"
+                />
+            </div>
+        </div>
+    }
+    @*Dokumen Surat Cerai (untuk status Janda/Duda) end*@
+
+    @* <div class="page-break"></div>
+    <div class="text-center fw-bold">
+        DOKUMEN PENDUKUNG
+    </div>
+    <br>
+    <table class="w-100 table-bordered text-center" style="height: 27cm;">
+        <tr>
+            <th width="30px">@(++number)</th>
+            <th>Fotocopy Surat Cerai (untuk status Janda/Duda)</th>
+        </tr>
+        <tr>
+            <td colspan="2" style="padding: 10px; vertical-align: top;">
+                <img src="@M.foto_surat_cerai" class="w-100" style="max-height: 24cm; height:auto;" />
+            </td>
+        </tr>
+    </table> *@
+
+</body>
+</html>

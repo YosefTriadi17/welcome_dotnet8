@@ -1,0 +1,462 @@
+name: CI/CD Pipeline Development
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+    if: |
+      (
+        # branch yang menerima code
+        github.event.pull_request.base.ref == 'main'
+      )
+      && 
+      (
+        # branch yang memberikan
+        startsWith(github.event.pull_request.head.ref, 'feat') || 
+        startsWith(github.event.pull_request.head.ref, 'fix') ||
+        startsWith(github.event.pull_request.head.ref, 'chore')
+      )
+
+env:
+  ACTION_USER_NAME: "[BOT]Github Action"
+  ACTION_USER_EMAIL: "GithubActions@users.noreply.github.com"
+
+jobs:
+  update-tag-and-release: 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.SD7IMFS_PAT }}
+          fetch-depth: 0
+
+      - name: Get Commit's Authors
+        id: get_authors
+        run: |
+          # Mengambil nama dan email penulis commit terakhir  
+          AUTHORS=$(git log -1 --pretty=format:'%an [%ae]')  
+          echo "authors: $AUTHORS"
+          echo "AUTHORS=$AUTHORS" >> $GITHUB_ENV
+
+      - name: Get Current Version
+        id: get-current-version
+        run: |
+          # Mengambil semua tag
+          git fetch --tags
+
+          # Mendapatkan tag terbaru di branch main
+          LATEST_TAG_MAIN=$(git tag --sort=-creatordate --merged main | head -n 1)
+
+          # Mendapatkan tag terbaru di branch production
+          LATEST_TAG_PROD=$(git tag --sort=-creatordate --merged production | head -n 1)
+
+          # Menampilkan tag terbaru
+          echo "Latest tag in main: $LATEST_TAG_MAIN"
+          echo "Latest tag in production: $LATEST_TAG_PROD"
+
+          # Menentukan tag terbaru di antara keduanya
+          if [ -z "$LATEST_TAG_MAIN" ] && [ -z "$LATEST_TAG_PROD" ]; then
+              # Jika tidak ada tag di kedua branch buat tag v1.0.0
+              LATEST_TAG="v1.0.0"
+              echo "No tags found. Creating initial tag: $LATEST_TAG"
+          elif [ "$LATEST_TAG_MAIN" = "$LATEST_TAG_PROD" ]; then
+              LATEST_TAG=$LATEST_TAG_MAIN
+          else
+              # Gabungkan semua tag, ambil yang terbaru berdasarkan tanggal
+              LATEST_TAG=$(git tag --sort=-creatordate | head -n 1)
+          fi
+
+          echo "Latest/Current tag overall: $LATEST_TAG"
+          echo "CURRENT_VERSION=$LATEST_TAG" >> $GITHUB_ENV
+
+      - name: Get Branch Name
+        id: get-branch-name
+        if: github.event.pull_request.merged == true
+        run: |
+          # Ambil nama cabang base, tujuan merge  
+          BASE_BRANCH_NAME="${{ github.base_ref }}"  
+          echo "Base branch name: $BASE_BRANCH_NAME"  
+
+          # Ambil nama cabang head, sumber merge
+          FULL_HEAD_BRANCH_NAME="${{ github.head_ref }}"  
+          echo "Full head branch name: $FULL_HEAD_BRANCH_NAME"
+
+          # Ambil nama sebelum karakter '/' lalu Convert nama branch ke lowercase
+          LOWERCASE_HEAD_BRANCH_NAME=$(echo "${FULL_HEAD_BRANCH_NAME%%/*}" | tr '[:upper:]' '[:lower:]')  
+          echo "Head branch name lowercase: $LOWERCASE_HEAD_BRANCH_NAME"
+
+          # Set output untuk digunakan di langkah berikutnya
+          echo "BASE_BRANCH_NAME=$BASE_BRANCH_NAME" >> $GITHUB_ENV
+          echo "FULL_HEAD_BRANCH_NAME=$FULL_HEAD_BRANCH_NAME" >> $GITHUB_ENV
+          echo "HEAD_BRANCH_NAME=$LOWERCASE_HEAD_BRANCH_NAME" >> $GITHUB_ENV
+
+      - name: Determine Next Version Branch Dev
+        id: determine-next-version-branch-dev
+        if: github.base_ref == 'main'
+        run: |
+          # pisahkan current_version, agar bisa di counter
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"\
+
+          # Nama branch yang di merge
+          echo "Head branch name: $HEAD_BRANCH_NAME"
+
+          # Versi sekarang
+          echo "Current version: $CURRENT_VERSION"
+
+          # Hitung versi berdasarkan kalkulasi
+          # Jika feat -> main
+          if [[ "$HEAD_BRANCH_NAME" == feat* ]]; then  
+            MINOR=$((MINOR + 1))  
+            PATCH=0  # Reset PATCH ke 0 jika minor ditingkatkan
+          # Jika fix -> main
+          elif [[ "$HEAD_BRANCH_NAME" == fix* ]]; then  
+            PATCH=$((PATCH + 1))
+          fi
+
+          # Versi baru
+          NEXT_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "Next version: $NEXT_VERSION"
+          echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
+
+      - name: Create and Push Tag
+        if: env.CURRENT_VERSION != env.NEXT_VERSION  
+        run: |
+          echo "Next version tag: $NEXT_VERSION"
+
+          git config user.name "$ACTION_USER_NAME"
+          git config user.email "$ACTION_USER_EMAIL"
+
+          git tag -f "$NEXT_VERSION"
+          git push origin "$NEXT_VERSION"
+          echo "Create and push version tag from $CURRENT_VERSION to $NEXT_VERSION in branch main"
+
+      - name: Check Remote and Branches
+        run: |
+          git remote -v
+          echo "BASE_BRANCH_NAME: $BASE_BRANCH_NAME"
+          echo "FULL_HEAD_BRANCH_NAME: $FULL_HEAD_BRANCH_NAME"
+
+      - name: Collecting Feat Commit Messages from Branches
+        id: collecting-feat-commit-messages-from-branches
+        run: |
+          # Untuk mendapatkan pesan commits semua remote branch terbaru
+          git fetch origin main
+
+          # ------ Ambil semua commits dengan awalan feat
+          git log --pretty=format:"- %s %H%n  %b" $(git merge-base origin/$BASE_BRANCH_NAME origin/$FULL_HEAD_BRANCH_NAME)..origin/$FULL_HEAD_BRANCH_NAME --no-merges --grep="^feat" -i > FEAT_COMMITS.txt
+
+          echo "feat commits:"
+          cat FEAT_COMMITS.txt
+
+      - name: Collecting Fix Commit Messages from Branches
+        id: collecting-fix-commit-messages-from-branches
+        run: |
+          # Untuk mendapatkan pesan commits semua remote branch terbaru
+          git fetch origin main
+
+          # ------ Ambil semua commits dengan awalan fix
+          git log --pretty=format:"- %s %H%n  %b" $(git merge-base origin/$BASE_BRANCH_NAME origin/$FULL_HEAD_BRANCH_NAME)..origin/$FULL_HEAD_BRANCH_NAME --no-merges --grep="^fix" -i > FIX_COMMITS.txt
+
+          echo "fix commits:"
+          cat FIX_COMMITS.txt
+
+      - name: Collecting Other Commit Messages from Branches
+        id: collecting-other-commit-messages-from-branches
+        run: |
+          # Untuk mendapatkan pesan commits semua remote branch terbaru
+          git fetch origin main
+
+          # ------ Ambil semua commits tanpa awalan feat dan fix
+          git log --pretty=format:"- %s %H%n  %b" $(git merge-base origin/$BASE_BRANCH_NAME origin/$FULL_HEAD_BRANCH_NAME)..origin/$FULL_HEAD_BRANCH_NAME --no-merges --grep='^fix' --invert-grep -i --grep='^feat' --invert-grep -i > OTHER_COMMITS.txt
+
+          echo "other commits:"
+          cat OTHER_COMMITS.txt
+
+      - name: Alert Commit Messages
+        run: echo "Jika Feat, Fix atau Chore .txt kosong, pastikan tipe pull request adalah 'Squash and merge'"
+
+      - name: Remove Remote Branch
+        if: github.head_ref != 'production' && github.head_ref != 'main'
+        run: |
+          # Hapus branch, Jika branch ada, kecuali branch production atau main
+          if git ls-remote --exit-code --heads origin $FULL_HEAD_BRANCH_NAME; then
+              git push origin --delete $FULL_HEAD_BRANCH_NAME
+              echo "Success delete branch $FULL_HEAD_BRANCH_NAME"
+          else
+              echo "Branch $FULL_HEAD_BRANCH_NAME does not exist."
+          fi
+          
+      - name: Create Release Requirements
+        run: |
+          RELEASE_DATE=$(TZ=Asia/Jakarta date +"%A, %d %B %Y %H:%M %Z")
+          
+          NEW_FEATURES=""
+          if [ -s FEAT_COMMITS.txt ]; then
+            NEW_FEATURES="### ✨ New Features
+            $(cat FEAT_COMMITS.txt)"
+          fi
+
+          BUG_FIXES=""
+          if [ -s FIX_COMMITS.txt ]; then
+            BUG_FIXES="### 🐛 Bug Fixes
+            $(cat FIX_COMMITS.txt)"
+          fi
+
+          OTHER=""
+          if [ -s OTHER_COMMITS.txt ]; then
+            OTHER="### ⚙️ Other
+            $(cat OTHER_COMMITS.txt)"
+          fi         
+
+          # ------ Buat release body
+          cat <<EOF > RELEASE_BODY.txt
+          ## 🎉 Version ${{ env.NEXT_VERSION }}
+          $RELEASE_DATE | Development | prev $CURRENT_VERSION
+
+          $NEW_FEATURES
+          $BUG_FIXES
+          $OTHER
+
+          ### 👤 Updated by
+          - $AUTHORS
+          EOF
+
+          echo "RELEASE_BODY<<EOF" >> $GITHUB_ENV
+          cat RELEASE_BODY.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          echo "Release body:"
+          cat RELEASE_BODY.txt
+
+      - name: Create GitHub Release
+        id: create-github-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.SD7IMFS_PAT }}
+        with:
+          tag_name: ${{ env.NEXT_VERSION }}
+          release_name: Release ${{ env.NEXT_VERSION }}
+          body: |
+            ${{ env.RELEASE_BODY }}
+          draft: false
+          prerelease: false
+
+      - name: Save Upload/Release URL
+        run: |
+          echo "${{ steps.create-github-release.outputs.upload_url }}" > upload_url.txt
+
+          echo "Release URL:"
+          cat upload_url.txt || true
+
+      - name: Append release body to CHANGELOG.md
+        run: |
+          # Buat file CHANGELOG.md jika tidak ada
+          if [ ! -f CHANGELOG.md ]; then
+            touch CHANGELOG.md
+            echo "CHANGELOG.md telah dibuat, karena tidak ditemukan di Repo."
+          fi
+
+          # Simpan konten lama ke dalam variabel
+          OLD_CONTENT=$(cat CHANGELOG.md)
+  
+          # Tulis konten lama dan baru di CHANGELOG.md  
+          echo "$RELEASE_BODY" > CHANGELOG.md
+          echo "------------" >> CHANGELOG.md
+          echo "$OLD_CONTENT" >> CHANGELOG.md
+
+          echo "Changelog.md:"
+          cat CHANGELOG.md
+          
+      - name: Updated version.txt file
+        run: echo "$NEXT_VERSION" > version.txt
+
+      - name: Commits Changes File
+        run: |
+          git config --local user.name "$ACTION_USER_NAME"
+          git config --local user.email "$ACTION_USER_EMAIL"  
+          git add version.txt
+          git add CHANGELOG.md
+          git commit -m "Bump version.txt from $CURRENT_VERSION to $NEXT_VERSION and updated CHANGELOG.md"
+          git push
+          echo "Bump version.txt from $CURRENT_VERSION to $NEXT_VERSION and updated CHANGELOG.md ok"
+
+      - name: Log Release Version
+        id: log-release-version
+        run: |
+          echo "Release version: ${{ env.NEXT_VERSION }}"
+
+      - name: Upload Artefak Changelog for IFS Docu App job
+        uses: actions/upload-artifact@v4
+        with:
+          name: CHANGELOG.md
+          path: CHANGELOG.md
+          retention-days: 1
+
+      - name: Upload Artefak upload_url.txt for update-tag-and-release job
+        uses: actions/upload-artifact@v4
+        with:
+          name: upload_url
+          path: upload_url.txt
+          retention-days: 1
+
+      - name: Upload Artefak version.txt for update-tag-and-release job
+        uses: actions/upload-artifact@v4
+        with:
+          name: version
+          path: version.txt
+          retention-days: 1
+  # -------------------------------------------------------------------- END JOB
+
+  build-and-publish:
+    runs-on: windows-latest
+    needs: update-tag-and-release
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.SD7IMFS_PAT }}
+
+      - name: Setup .NET 5
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '5.x.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Build and Publish Application
+        run: |
+          $CSPROJ_PATH = (Get-ChildItem -Recurse -Filter "*.csproj" | Select-Object -First 1).FullName
+
+          Write-Host "Publishing $CSPROJ_PATH"
+          dotnet publish $CSPROJ_PATH --configuration Release --output ./publish --verbosity minimal
+
+      - name: Current Publish List File
+        run: |
+          echo "publish list file:"
+          Get-ChildItem -Path publish || true
+
+      - name: Remove Unnecessary Publish Files
+        run: |
+          if (Test-Path publish\wwwroot) { Remove-Item -Recurse -Force publish\wwwroot }
+          if (Test-Path publish\appsettings.json) { Remove-Item -Force publish\appsettings.json }
+          if (Test-Path publish\appsettings.Development.json) { Remove-Item -Force publish\appsettings.Development.json }
+
+      - name: Download Next Version Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: version
+      
+      - name: Read Next Version
+        id: read-next-version
+        run: |
+          $VERSION = Get-Content version.txt
+          echo "VERSION=$VERSION" >> $env:GITHUB_ENV
+          echo "VERSION: $VERSION"
+
+      - name: Download Upload URL Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: upload_url
+
+      - name: Read Upload URL
+        id: read-upload-url
+        run: |
+          $UPLOAD_URL = Get-Content upload_url.txt
+          echo "UPLOAD_URL=$UPLOAD_URL" >> $env:GITHUB_ENV
+          echo "UPLOAD_URL: $UPLOAD_URL"
+
+      - name: Copy Version.txt to Publish Folder
+        run: |
+          Copy-Item version.txt publish\version.txt
+
+      - name: Updated Publish List File
+        run: |
+          echo "publish list file:"
+          Get-ChildItem -Path publish || true
+
+      - name: Zip Publish Folder
+        run: |
+          Compress-Archive -Path publish\* -DestinationPath publish.zip || true
+
+      - name: List All File
+        run: |
+          Get-ChildItem || true
+
+      - name: Upload Publish Zip
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.SD7IMFS_PAT }}
+        with:
+          upload_url: ${{ env.UPLOAD_URL }}
+          asset_path: publish.zip
+          asset_name: "publish-${{ github.event.repository.name }}-${{ env.VERSION }}.zip"
+          asset_content_type: application/zip
+  # -------------------------------------------------------------------- END JOB
+            
+  connect-to-ifs-docu-app:
+    runs-on: ubuntu-latest
+    needs: update-tag-and-release
+    steps:
+      - name: Download Artefak Changelog
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: CHANGELOG.md
+
+      - name: Show File Changelog.md
+        run: |
+          if [ ! -f CHANGELOG.md ]; then
+            touch CHANGELOG.md
+            echo "CHANGELOG.md telah dibuat, karena tidak ditemukan di Artefak."
+          fi
+
+          echo "Changelog file:"
+          ls -l | grep CHANGELOG
+
+      - name: Extract Repository Name
+        run: |
+          echo "REPO_NAME=${GITHUB_REPOSITORY##*/}"
+          echo "REPO_NAME=${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
+
+      - name: Add Repository Title with Space to CHANGELOG.md
+        run: |
+          echo "# ${{ env.REPO_NAME }}" > MODIFIED_CHANGELOG.md
+          echo "" >> MODIFIED_CHANGELOG.md 
+          cat CHANGELOG.md >> MODIFIED_CHANGELOG.md
+
+          echo "DESTINATION_REPO_PAT: ${{ secrets.DESTINATION_REPO_PAT }}"
+          echo "MODIFIED_CHANGELOG.md:"
+          cat MODIFIED_CHANGELOG.md
+
+      - name: Clone Destination Repository
+        uses: actions/checkout@v3
+        with:
+          repository: caesariodito/ifs-docu-app
+          token: ${{ secrets.DESTINATION_REPO_PAT }}
+          path: dest-repo
+
+      - name: Move Modified CHANGELOG.md
+        run: |
+          mkdir -p dest-repo/docs
+          mv MODIFIED_CHANGELOG.md dest-repo/docs/${{ env.REPO_NAME }}-CHANGELOG.md
+          echo "move Changelog.md into: dest-repo/docs/${{ env.REPO_NAME }}-CHANGELOG.md"
+
+      - name: Commit and Push Changes into Docu App
+        run: |
+          cd dest-repo
+          git config user.name "$ACTION_USER_NAME"
+          git config user.email "$ACTION_USER_EMAIL"
+          git add docs/${{ env.REPO_NAME }}-CHANGELOG.md
+          git commit -m "Update /docs/${{ env.REPO_NAME }}-CHANGELOG.md from ${{ env.REPO_NAME }}"
+          git push
