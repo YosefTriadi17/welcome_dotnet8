@@ -31,7 +31,7 @@ func HelloServer(w http.ResponseWriter, r *http.Request) {
 // Release 366
 // changes 1
 
-// git checkout -b feat/new3
+// git checkout -b feat/new5
 
 // git checkout production
 
@@ -41,11 +41,11 @@ func HelloServer(w http.ResponseWriter, r *http.Request) {
 
 // git commit -am "chore: Tusesday 11 Feb 2025" -m "Merapikan kode yang amburadul"
 
-// git push --set-upstream origin feat/new2 -f
+// git push --set-upstream origin feat/new5 -f
 
 // git checkout main
 
-// git branch -d feat/new2 -f
+// git branch -d feat/new5 -f
 
 
 
