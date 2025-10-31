@@ -6,7 +6,7 @@ builder.Services.AddControllersWithViews();
 var app = builder.Build();
 
 // === Path base untuk /welcome ===
-app.UsePathBase("/welcome");
+//app.UsePathBase("/welcome");
 app.UseRouting();
 
 app.Use(async (context, next) =>
