@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\welcome-dotnet8.props" />
+</Project>

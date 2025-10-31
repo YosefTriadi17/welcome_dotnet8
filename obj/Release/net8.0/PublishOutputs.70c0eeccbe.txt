@@ -1,0 +1,7 @@
+D:\IFS\welcome-dotnet8\obj\Release\net8.0\PubTmp\Out\welcome-dotnet8.exe
+D:\IFS\welcome-dotnet8\obj\Release\net8.0\PubTmp\Out\appsettings.Development.json
+D:\IFS\welcome-dotnet8\obj\Release\net8.0\PubTmp\Out\appsettings.json
+D:\IFS\welcome-dotnet8\obj\Release\net8.0\PubTmp\Out\welcome-dotnet8.dll
+D:\IFS\welcome-dotnet8\obj\Release\net8.0\PubTmp\Out\welcome-dotnet8.deps.json
+D:\IFS\welcome-dotnet8\obj\Release\net8.0\PubTmp\Out\welcome-dotnet8.runtimeconfig.json
+D:\IFS\welcome-dotnet8\obj\Release\net8.0\PubTmp\Out\welcome-dotnet8.pdb

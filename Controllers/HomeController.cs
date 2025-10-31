@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
+using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using welcome.Models;
-using StackExchange.Redis;
+using welcome_dotnet8.Models;
 
-namespace welcome.Controllers
+namespace welcome_dotnet8.Controllers
 {
     public class HomeController : Controller
     {
@@ -18,21 +15,6 @@ namespace welcome.Controllers
 
         public IActionResult Index()
         {
-            //var muxer = ConnectionMultiplexer.Connect(
-            //    new ConfigurationOptions
-            //    {
-            //        EndPoints = { { "redis-14506.c228.us-central1-1.gce.redns.redis-cloud.com", 14506 } },
-            //        User = "default",
-            //        Password = "AQp8KNpFXBcvCy9YgVqUWQFwTd7sIFeJ"
-            //    }
-            //);
-            //var db = muxer.GetDatabase();
-
-            //db.StringSet("foo", "barikade sudosu");
-            //db.StringSet("fee", "bar");
-            //RedisValue result = db.StringGet("foo");
-            //Console.WriteLine(result); // >>> bar
-            //return Ok(result);
             return View();
         }
 
@@ -45,11 +27,6 @@ namespace welcome.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-
-        public IActionResult LoadData()
-        {
-            return View();
         }
     }
 }
