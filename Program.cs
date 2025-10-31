@@ -5,7 +5,8 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-//app.UsePathBase("/welcome");
+app.UsePathBase("/welcome");
+app.UseRouting();
 
 app.Use(async (context, next) =>
 {
@@ -27,8 +28,6 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
-app.UseRouting();
 
 app.UseAuthorization();
 
