@@ -8,15 +8,15 @@ var app = builder.Build();
 app.UsePathBase("/welcome");
 app.UseRouting();
 
-app.Use(async (context, next) =>
-{
-    if (!context.Request.Path.StartsWithSegments("/welcome"))
-    {
-        context.Response.Redirect("/welcome" + context.Request.Path + context.Request.QueryString);
-        return;
-    }
-    await next();
-});
+//app.Use(async (context, next) =>
+//{
+//   if (!context.Request.Path.StartsWithSegments("/welcome"))
+//    {
+//        context.Response.Redirect("/welcome" + context.Request.Path + context.Request.QueryString);
+//        return;
+//    }
+//    await next();
+//});
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
