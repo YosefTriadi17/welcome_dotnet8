@@ -6,12 +6,12 @@ builder.Services.AddControllersWithViews();
 var app = builder.Build();
 
 // === Path base untuk /welcome ===
-app.UsePathBase("/welcome");
+//app.UsePathBase("/welcome");
 app.UseRouting();
 
 app.UseStaticFiles(new StaticFileOptions
 {
-    RequestPath = "/welcome",
+    //RequestPath = "/welcome",
     OnPrepareResponse = ctx =>
     {
         ctx.Context.Response.Headers["Cache-Control"] = "public,max-age=600";
